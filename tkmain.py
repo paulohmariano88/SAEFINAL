@@ -56,7 +56,7 @@ def draw_center_rectangle(frame, change_color=False):
     color = (0, 0, 255) if change_color else (0, 255, 255)
 
     if change_color:
-        cv2.putText(frame, "PERIGO!", (center_x - 40, center_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, "DANGER!", (center_x - 40, center_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
     return cv2.rectangle(frame, top_left, bottom_right, color, 3)
 
@@ -70,7 +70,7 @@ def stop_sound():
     """Função para parar o som."""
     pygame.mixer.music.stop()
 
-def run_segmentation(conf_threshold=0.70):
+def run_segmentation(conf_threshold=0.879):
     global rect_width, rect_height
 
     try:
@@ -99,7 +99,7 @@ def run_segmentation(conf_threshold=0.70):
                 sound_played = False
 
             frame = draw_center_rectangle(frame, change_color=is_mask_inside)
-            cv2.imshow("Reconhecimento de Luva", frame)
+            cv2.imshow("Sistema de Visão Computacional SAETOWER", frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -146,7 +146,13 @@ def start_tkinter_interface():
         rect_height = int(float(value))  # Corrigido para lidar com valores float do slider
 
     root = tk.Tk()
-    root.title("Configuração do Retângulo")
+    root.title("Configuração da Área de Segurança")
+
+    root.geometry("400x300")
+
+    style = ttk.Style()
+
+    style.configure("TScale", sliderlength=30, troughcolor="lightgray")
 
     tk.Label(root, text="Largura").pack()
     width_slider = ttk.Scale(root, from_=50, to=500, orient='horizontal', command=update_width)

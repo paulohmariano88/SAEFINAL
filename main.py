@@ -3,8 +3,10 @@ from ultralytics import YOLO
 import numpy as np
 import pygame  # Importa o pygame para tocar sons
 import threading
+# from signal import Signal
+from gpiozero import OutputDevice
 
-from signal import Signal  # Importa a biblioteca para criação de threads
+# from signal import Signal  # Importa a biblioteca para criação de threads
 
 MODEL_PATH = "weights/best.pt"
 ALERT_SOUND = "sound/danger3.mp3"
@@ -17,10 +19,10 @@ def open_video_source():
     """Abre o fonte de vídeo (webCam ou arquivo)"""
     cap = cv2.VideoCapture(1)
     if not cap.isOpened():
-        print("Sem fonte em 0, tentando em 1")
-        cap = cv2.VideoCapture(0)
+         print("Sem fonte em 0, tentando em 1")
+         cap = cv2.VideoCapture(0)
     elif not cap.isOpened():
-        raise ValueError("Erro: sem fonte de vídeo")
+         raise ValueError("Erro: sem fonte de vídeo")
     return cap
 
 def process_frame(frame, model, conf_threshold):
@@ -103,7 +105,7 @@ def stop_sound():
     """Função para parar o som."""
     pygame.mixer.music.stop()
 
-def run_segmentation(conf_threshold=0.70):
+def run_segmentation(conf_threshold=0.879):
     """
     Executa a segmentação em tempo real usando o modelo YOLOv8-Seg com filtro de confiança.
     
@@ -118,9 +120,11 @@ def run_segmentation(conf_threshold=0.70):
         cap = open_video_source()
 
         sound_played = False  # Variável para controlar o estado do som
-        relay_activated = False
+        
 
-        signal = Signal(relay_pin=17)
+        #signal = Signal(relay_pin=17)
+        relay = OutputDevice(4)  # Substitui GPIO.setup
+        
 
         while True:
             ret, frame = cap.read()
@@ -143,8 +147,10 @@ def run_segmentation(conf_threshold=0.70):
                     sound_played = True  # Marca que o som foi tocado
 
                 if not relay_activated:
-                    signal.activate_relay()
+                    
                     relay_activated = True
+                    relay.on()  # Liga o relé
+
                      
 
             else:
@@ -152,7 +158,7 @@ def run_segmentation(conf_threshold=0.70):
                     stop_sound()  # Para o som se a luva sair da área
                     sound_played = False  # Reseta o controle de som
                 if relay_activated:
-                    signal.deactivate_relay()
+                    relay.off()  # Desliga o relé
                     relay_activated = False
 
             # Desenha o retângulo (fica vermelho se a luva estiver dentro)
@@ -166,11 +172,12 @@ def run_segmentation(conf_threshold=0.70):
     except ValueError as e:
         print(e)
     finally:
-        signal.cleanup_gpio()
+        # signal.cleanup_gpio()
         cap.release()
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     run_segmentation()
+
 
 
