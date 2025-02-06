@@ -6,7 +6,7 @@ import numpy as np
 import pygame
 import threading
 
-MODEL_PATH = "weights/best.pt"
+MODEL_PATH = "weights/best2.pt"
 ALERT_SOUND = "sound/danger3.mp3"
 
 # Variáveis globais para o tamanho do retângulo
