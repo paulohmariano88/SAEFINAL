@@ -5,12 +5,12 @@ from tkinter import messagebox
 import cv2
 from ultralytics import YOLO
 import numpy as np
-import pygame
 import threading
 from PIL import Image, ImageTk
 
+from signalanalogic import SignalAnalogical
+
 MODEL_PATH = "weights/best2.pt"
-ALERT_SOUND = "sound/danger3.mp3"
 LOGO_PATH = "image/logo.jpg"
 ICON_PATH = os.path.abspath("image/favicon.ico")
 CORRECT_PASSWORD = "tower25"  # Defina a senha desejada 
@@ -69,8 +69,7 @@ class VisionApp:
         if not self.cap.isOpened():
             raise ValueError("Erro: sem fonte de vídeo")
 
-        self.sound_played = False
-
+        self.load_logo()
         self.update_frame()
     
     def set_window_icon(self):
@@ -156,10 +155,19 @@ class VisionApp:
 
         # Exibir alertas
         if is_danger:
+            objectSignal =  SignalAnalogical()
             cv2.putText(frame, "DANGER", (center_x - 80, center_y - 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 4)
+            thread_danger = threading.Thread(target=objectSignal.send_signal_danger(), args=("Thread-1", 1))
+            thread_danger.start()
+            thread_danger.join()
+            
 
         if is_critical:
             cv2.putText(frame, "CRITICAL", (center_x - 50, center_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 5)
+            objectSignal =  SignalAnalogical()
+            thread_critical = threading.Thread(target=objectSignal.send_signal_danger(), args=("Thread-2", 2))
+            thread_critical.start()
+            thread_critical.join()
 
         return frame
 
