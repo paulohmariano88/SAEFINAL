@@ -8,7 +8,7 @@ import numpy as np
 import threading
 from PIL import Image, ImageTk
 
-from signalanalogic import SignalAnalogical
+# from src.signalanalogic import UniversalGPIO
 
 MODEL_PATH = "weights/best2.pt"
 LOGO_PATH = "image/logo.jpg"
@@ -30,6 +30,8 @@ class VisionApp:
         self.root = root
         self.root.title("AI COMPUTER VISION SAETOWERS")
         self.root.configure(bg="#3B3B3B")
+        
+        # self.objectSignal = UniversalGPIO() #GPIO
 
         # Definir ícone da janela
         self.set_window_icon()
@@ -153,21 +155,21 @@ class VisionApp:
         cv2.rectangle(frame, (center_x - rect_critical_width // 2, center_y - rect_critical_height // 2),
                       (center_x + rect_critical_width // 2, center_y + rect_critical_height // 2), critical_color, 3)
 
+        
         # Exibir alertas
         if is_danger:
-            objectSignal =  SignalAnalogical()
             cv2.putText(frame, "DANGER", (center_x - 80, center_y - 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 4)
-            thread_danger = threading.Thread(target=objectSignal.send_signal_danger(), args=("Thread-1", 1))
-            thread_danger.start()
-            thread_danger.join()
-            
+            # threading.Thread(target=self.objectSignal.set_danger, daemon=True).start()
+        else:
+            pass
+            # threading.Thread(target=self.objectSignal.reset_danger, daemon=True).start()
 
         if is_critical:
             cv2.putText(frame, "CRITICAL", (center_x - 50, center_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 5)
-            objectSignal =  SignalAnalogical()
-            thread_critical = threading.Thread(target=objectSignal.send_signal_danger(), args=("Thread-2", 2))
-            thread_critical.start()
-            thread_critical.join()
+            # threading.Thread(target=self.objectSignal.set_critical, daemon=True).start()
+        else:
+            pass
+            # threading.Thread(target=self.objectSignal.reset_critical, daemon=True).start()
 
         return frame
 
@@ -236,6 +238,7 @@ class VisionApp:
         
         if entered_password == CORRECT_PASSWORD:
             messagebox.showinfo("Access released", "Password correct!")
+            self.password_entry.delete(0, tk.END)
             self.enable_controls()
         else:
             messagebox.showerror("Access Denied", "Incorrect password!")
