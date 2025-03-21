@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 
 # from src.signalanalogic import UniversalGPIO
 
-MODEL_PATH = "weights/best2.pt"
+MODEL_PATH = "weights/yolo11.pt"
 LOGO_PATH = "image/logo.jpg"
 ICON_PATH = os.path.abspath("image/favicon.ico")
 CORRECT_PASSWORD = "tower25"  # Defina a senha desejada 
